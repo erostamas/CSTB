@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/game_list_item_root"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:background="#00D1C2C2"
+    android:backgroundTint="#00DA0E0E"
+    android:backgroundTintMode="add"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/result"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="serif-monospace"
+        android:textAlignment="center"
+        android:textColor="@color/colorResultText"
+        android:textSize="15sp"
+        tools:text=" - " />
+
+    <TextView
+        android:id="@+id/home"
+        android:layout_width="189dp"
+        android:layout_height="25dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="15dp"
+        android:layout_toLeftOf="@id/result"
+        android:fontFamily="serif-monospace"
+        android:textAlignment="textEnd"
+        android:textColor="@color/colorHomeText"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        tools:text="HOME" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="false"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="21dp"
+        android:fontFamily="sans-serif-smallcaps"
+        android:textAlignment="center"
+        android:textColor="@color/colorDateText"
+        android:textSize="17sp"
+        tools:text="18:15" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="false"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="0dp"
+        android:fontFamily="sans-serif-smallcaps"
+        android:textAlignment="center"
+        android:textColor="@color/colorDateText"
+        android:textSize="17sp"
+        tools:text="2020-01-01" />
+
+    <TextView
+        android:id="@+id/away"
+        android:layout_width="130dp"
+        android:layout_height="25dp"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="0dp"
+        android:layout_toRightOf="@id/result"
+        android:fontFamily="serif-monospace"
+        android:textAlignment="textStart"
+        android:textColor="@color/colorAwayText"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        tools:text="AWAY" />
+
+
+</RelativeLayout>

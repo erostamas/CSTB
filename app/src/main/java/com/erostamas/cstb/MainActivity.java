@@ -6,13 +6,16 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
+import com.erostamas.cstb.ui.main.FilteredGameListFragment;
 import com.erostamas.cstb.ui.main.SectionsPagerAdapter;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
+
+    public LeagueDataBase leagueDataBase = new LeagueDataBase();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,5 +35,8 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        ArrayList<String> res = new ArrayList<String>();
+        LeagueDatabaseClient client = new LeagueDatabaseClient(leagueDataBase);
+        client.execute();
     }
 }
