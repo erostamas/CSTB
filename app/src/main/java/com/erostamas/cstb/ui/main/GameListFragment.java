@@ -8,6 +8,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,28 +21,47 @@ import com.erostamas.cstb.R;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class FilteredGameListFragment extends Fragment implements GameListRecyclerViewAdapter.ItemClickListener{
+public class GameListFragment extends Fragment implements GameListRecyclerViewAdapter.ItemClickListener{
 
     private static final String ARG_SECTION_NUMBER = "section_number";
+    private static final String ARG_MY_TEAM_NAME = "my_team";
 
     private PageViewModel pageViewModel;
-    public static GameListRecyclerViewAdapter adapter;
+    public GameListRecyclerViewAdapter adapter;
 
-    public static FilteredGameListFragment newInstance(int index) {
-        FilteredGameListFragment fragment = new FilteredGameListFragment();
+    private String _myTeam = "";
+
+    public static GameListFragment newInstance(int index) {
+        Log.i("erostamasdebug", "GameListFragment newinstance without myteam");
+        GameListFragment fragment = new GameListFragment();
         Bundle bundle = new Bundle();
         bundle.putInt(ARG_SECTION_NUMBER, index);
         fragment.setArguments(bundle);
         return fragment;
     }
 
+    public static GameListFragment newInstance(int index, String myTeam) {
+        Log.i("erostamasdebug", "GameListFragment newinstance with myteam: " + myTeam);
+        GameListFragment fragment = new GameListFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(ARG_SECTION_NUMBER, index);
+        bundle.putString(ARG_MY_TEAM_NAME, myTeam);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.i("erostamasdebug", "GameListFragment oncreate");
         super.onCreate(savedInstanceState);
         pageViewModel = ViewModelProviders.of(this).get(PageViewModel.class);
         int index = 1;
         if (getArguments() != null) {
             index = getArguments().getInt(ARG_SECTION_NUMBER);
+            if (getArguments().containsKey(ARG_MY_TEAM_NAME)) {
+                _myTeam = getArguments().getString(ARG_MY_TEAM_NAME);
+            }
+            Log.i("erostamasdebug", "GameListFragment oncreate myteam arg: " + _myTeam);
         }
         pageViewModel.setIndex(index);
     }
@@ -61,7 +81,8 @@ public class FilteredGameListFragment extends Fragment implements GameListRecycl
         int numberOfColumns = 1;
         //recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), numberOfColumns));
-        adapter = new GameListRecyclerViewAdapter(getActivity(), ((MainActivity)getActivity()).leagueDataBase, this);
+        Log.i("erostamasdebug", "new GameListRecyclerViewAdapter with myteam: " + _myTeam);
+        adapter = new GameListRecyclerViewAdapter(getActivity(), ((MainActivity)getActivity()).leagueDataBase, this, _myTeam);
         adapter.setClickListener(this);
         adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);

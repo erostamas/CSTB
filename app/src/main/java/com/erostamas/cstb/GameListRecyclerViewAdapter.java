@@ -14,22 +14,53 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.erostamas.cstb.ui.main.FilteredGameListFragment;
+import com.erostamas.cstb.ui.main.GameListFragment;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Vector;
 
 public class GameListRecyclerViewAdapter extends RecyclerView.Adapter<GameListRecyclerViewAdapter.ViewHolder> {
 
     private LeagueDataBase leagueDataBase;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
-    private FilteredGameListFragment filteredGameListFragment;
+    private GameListFragment gameListFragment;
     private Context context;
+    private String myTeam = "";
+    private ArrayList<Integer> filterIndexes = new ArrayList<>();
 
-    // data is passed into the constructor
-    public GameListRecyclerViewAdapter(Context context, LeagueDataBase leagueDataBase, FilteredGameListFragment filteredGameListFragment) {
+    public GameListRecyclerViewAdapter(Context context, LeagueDataBase leagueDataBase, GameListFragment gameListFragment, String myTeam) {
         this.mInflater = LayoutInflater.from(context);
         this.leagueDataBase = leagueDataBase;
-        this.filteredGameListFragment = filteredGameListFragment;
+        this.gameListFragment = gameListFragment;
         this.context = context;
+        this.myTeam = myTeam;
+        this.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                Log.i("erostamasdebug", "onChanged filtered");
+                super.onChanged();
+                reIndex();
+            }
+        });
+
+    }
+
+    public GameListRecyclerViewAdapter(Context context, final LeagueDataBase leagueDataBase, GameListFragment gameListFragment) {
+        this(context, leagueDataBase, gameListFragment, "");
+    }
+
+    private void reIndex() {
+        Log.i("erostamasdebug", "reIndex database size: " + Integer.toString(leagueDataBase.getGames().size()) + " myteam: " + myTeam);
+        filterIndexes.clear();
+        for (int index = 0; index < leagueDataBase.getGames().size(); index++) {
+            Log.i("erostamasdebug", "home team: " + leagueDataBase.getGames().get(index)._home);
+            if (myTeam.isEmpty() || leagueDataBase.getGames().get(index)._home.equals(myTeam) || leagueDataBase.getGames().get(index)._away.equals(myTeam)) {
+                Log.i("erostamasdebug", "adding to filteredIndexes: " + Integer.toString(index));
+                filterIndexes.add(index);
+            }
+        }
     }
 
     // inflates the cell layout from xml when needed
@@ -43,31 +74,31 @@ public class GameListRecyclerViewAdapter extends RecyclerView.Adapter<GameListRe
     // binds the data to the TextView in each cell
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ((TextView)holder.rootView.findViewById(R.id.home)).setText(leagueDataBase.getGames().get(position)._home);
-        ((TextView)holder.rootView.findViewById(R.id.away)).setText(leagueDataBase.getGames().get(position)._away);
-        ((TextView)holder.rootView.findViewById(R.id.date)).setText(DateFormat.format("yyyy MMM dd", leagueDataBase.getGames().get(position)._dateTime).toString());
-        ((TextView)holder.rootView.findViewById(R.id.time)).setText(DateFormat.format("HH:mm", leagueDataBase.getGames().get(position)._dateTime).toString());
-        if (!leagueDataBase.getGames().get(position)._result.isEmpty()) {
-            Log.i("erostamasdebug", "result: " + leagueDataBase.getGames().get(position)._result + " size: " + leagueDataBase.getGames().get(position)._result.length());
-            ((TextView) holder.rootView.findViewById(R.id.result)).setText(leagueDataBase.getGames().get(position)._result);
+        int realPosition = filterIndexes.get(position);
+        ((TextView)holder.rootView.findViewById(R.id.home)).setText(leagueDataBase.getGames().get(realPosition)._home);
+        ((TextView)holder.rootView.findViewById(R.id.away)).setText(leagueDataBase.getGames().get(realPosition)._away);
+        ((TextView)holder.rootView.findViewById(R.id.date)).setText(DateFormat.format("yyyy MMM dd", leagueDataBase.getGames().get(realPosition)._dateTime).toString());
+        ((TextView)holder.rootView.findViewById(R.id.time)).setText(DateFormat.format("HH:mm", leagueDataBase.getGames().get(realPosition)._dateTime).toString());
+        if (!leagueDataBase.getGames().get(realPosition)._result.isEmpty()) {
+            Log.i("erostamasdebug", "result: " + leagueDataBase.getGames().get(realPosition)._result + " size: " + leagueDataBase.getGames().get(realPosition)._result.length());
+            ((TextView) holder.rootView.findViewById(R.id.result)).setText(leagueDataBase.getGames().get(realPosition)._result);
         } else {
             ((TextView) holder.rootView.findViewById(R.id.result)).setText(" - ");
         }
 
-        if (leagueDataBase.getGames().get(position)._result.isEmpty() && (!leagueDataBase.getGames().get(position - 1)._result.isEmpty() || position == 0)) {
+        if (!this.myTeam.isEmpty() && (leagueDataBase.getGames().get(realPosition)._result.isEmpty() && (!leagueDataBase.getGames().get(filterIndexes.get(position - 1))._result.isEmpty() || position == 0))) {
             ((TextView) holder.rootView.findViewById(R.id.time)).setTextColor(ContextCompat.getColor(context, R.color.colorNextDateText));
             ((TextView) holder.rootView.findViewById(R.id.date)).setTextColor(ContextCompat.getColor(context, R.color.colorNextDateText));
         }
-        holder.position = position;
+        holder.position = realPosition;
 
     }
 
     // total number of cells
     @Override
     public int getItemCount() {
-        return leagueDataBase.getGames().size();
+        return filterIndexes.size();
     }
-
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -99,7 +130,7 @@ public class GameListRecyclerViewAdapter extends RecyclerView.Adapter<GameListRe
         private final MenuItem.OnMenuItemClickListener mOnMyActionClickListener = new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                //FilteredGameListFragment.favourites.remove(position);
+                //GameListFragment.favourites.remove(position);
                 //favouritesFragment.adapter.notifyDataSetChanged();
                 return true;
             }
@@ -110,7 +141,7 @@ public class GameListRecyclerViewAdapter extends RecyclerView.Adapter<GameListRe
 
     // convenience method for getting data at click position
     public Game getItem(int id) {
-        return leagueDataBase.getGames().get(id);
+        return leagueDataBase.getGames().get(filterIndexes.get(id));
     }
 
     // allows clicks events to be caught

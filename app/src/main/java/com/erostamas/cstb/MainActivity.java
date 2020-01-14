@@ -8,7 +8,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.erostamas.cstb.ui.main.FilteredGameListFragment;
 import com.erostamas.cstb.ui.main.SectionsPagerAdapter;
 
 import java.util.ArrayList;
@@ -16,16 +15,22 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     public LeagueDataBase leagueDataBase = new LeagueDataBase();
+    private String leagueDatabaseUrl = "http://www.bajnoksagok.hu/2057/sorsolas/T%C3%A9li+Bajnoks%C3%A1g+2020+-+Kedd-1?fbclid=IwAR0MUHGlAmrn4gZfsL5GaH-DZHdhVUbJhi_zsbGdAX4Z66ei9f-aiAoqffM";
+    private String myTeam = "CSTB";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
+
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager(), leagueDatabaseUrl, myTeam);
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
+        LeagueDatabaseClient client = new LeagueDatabaseClient(leagueDataBase, leagueDatabaseUrl, myTeam, sectionsPagerAdapter);
+        client.execute();
+
         FloatingActionButton fab = findViewById(R.id.fab);
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -35,8 +40,5 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        ArrayList<String> res = new ArrayList<String>();
-        LeagueDatabaseClient client = new LeagueDatabaseClient(leagueDataBase);
-        client.execute();
     }
 }
